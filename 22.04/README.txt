@@ -1,0 +1,1 @@
+El script del profesorado no se ejecuta con sudo sino de forma normal ./instalacionProfesorado.sh
