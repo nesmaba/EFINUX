@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # Obtener la interfaz de red predeterminada
-default_interface=$(ip route show default | awk '/default/ {print $5}')
+default_interface=$(ip route | grep '^default' | head -n 1 | awk '{print $5}' | xargs)
 
 # Verificar si se pudo obtener la interfaz predeterminada
 if [ -n "$default_interface" ]; then
     echo "La interfaz de red predeterminada es: $default_interface"
 
     # Obtener la red y la máscara en formato CIDR (por ejemplo, 10.2.123.0/24)
-    network=$(ip -o -f inet addr show $default_interface | awk '{print $4}')
+    network=$(ip -o -f inet addr show dev $default_interface | awk '{print $4}' | head -n 1)
 
     # Obtener la dirección IP local
     local_ip=$(hostname -I | awk '{print $1}')
