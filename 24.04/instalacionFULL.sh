@@ -93,6 +93,10 @@ preparar_instalacion_packettracer(){
     instalar_deb libxcb-xinerama0-dev_1.15-1ubuntu2_amd64.deb
 }
 
+preparar_instalacion_abconnector(){
+    sudo apt install python3 python3-tk python3-serial python-is-python3
+}
+
 instala_programas_eso(){
     # Instalar AppImages
     instalar_appimage "Arduino.AppImage"
@@ -121,13 +125,15 @@ instala_programas_fp(){
     # Instalar Wireshark
     sudo apt install -y wireshark
 	
-	preparar_instalacion_packettracer
+    preparar_instalacion_packettracer
+    preparar_instalacion_abconnector
 
     # Instalar paquetes .deb
     instalar_deb "PacketTracer.deb"
     instalar_deb "VirtualBox.deb"
     instalar_deb "VSCode.deb"
-
+    instalar_deb "abconnector_v5_4_linux64.deb"
+    
 }
 
 
