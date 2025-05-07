@@ -15,7 +15,12 @@ if [ -n "$default_interface" ]; then
 
     # Realizar un escaneo de la red para descubrir dispositivos (excluye la IP local y la IP 10.2.123.21)
     echo "Realizando escaneo de la red en el rango $network..."
-    lan_ips=$(nmap -sn --exclude $local_ip,10.2.123.21 $network | grep "Nmap scan report" | awk '{print $NF}')
+    
+    # Ecxcluyo mi propia ip y la del pc del profesor de la otra aula.
+    excluded_ips="$local_ip,10.2.123.21"
+    lan_ips=$(nmap -sn --exclude $excluded_ips $network | grep "Nmap scan report" | awk '{print $NF}')
+
+    # lan_ips=$(nmap -sn --exclude $local_ip,10.2.123.21 $network | grep "Nmap scan report" | awk '{print $NF}')
 
     # Verificar si se encontraron direcciones IP
     if [ -n "$lan_ips" ]; then
