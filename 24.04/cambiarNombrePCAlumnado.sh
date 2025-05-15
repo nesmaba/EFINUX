@@ -14,8 +14,8 @@ read -p "Introduce el número del aula (ej. 118, 119, 403, 404): " aula
 
 # Determinar sufijo según aula
 case "$aula" in
-    118) tipo="INF2" ;;
-    119) tipo="INF1" ;;
+    118) tipo="INF1" ;;
+    119) tipo="INF2" ;;
     403) tipo="SMR2" ;;
     404) tipo="SMR1" ;;
     *)
