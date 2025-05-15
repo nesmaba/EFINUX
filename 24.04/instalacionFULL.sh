@@ -550,13 +550,20 @@ fin(){
 	sudo reboot
 }
 
+# INICIO DEL SCRIPT
+
+# Comprobar conexión a Internet
+if ping -q -c 1 -W 2 8.8.8.8 >/dev/null; then
+    echo "Conexión a Internet detectada."
+else
+    echo "Sin conexión a Internet. Saliendo del script."
+    exit 1
+fi
+
 echo "Seleccione el tipo de instalación:"
 echo "1) Profesorado"
 echo "2) Alumnado"
 read -p "Ingrese una opción (1 o 2): " opcionProfeAlum
-
-
-
 
 # Configuración específica según la opción elegida
 if [ "$opcionProfeAlum" == "1" ]; then
