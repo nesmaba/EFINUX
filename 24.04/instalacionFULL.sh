@@ -120,6 +120,23 @@ instala_programas_eso(){
     instala_programas_fp
 }
 
+arreglar_virtualbox(){
+	sudo apt install -y virtualbox virtualbox-dkms linux-headers-$(uname -r)
+
+	echo "✅ Cargando módulos de VirtualBox..."
+	sudo modprobe vboxdrv 2>/dev/null && echo "vboxdrv cargado"
+	sudo modprobe vboxnetflt 2>/dev/null && echo "vboxnetflt cargado"
+	sudo modprobe vboxnetadp 2>/dev/null && echo "vboxnetadp cargado"
+	sudo modprobe vboxpci 2>/dev/null && echo "vboxpci cargado (opcional)"
+
+	echo "📌 Configurando carga automática de módulos en cada arranque..."
+	echo "vboxdrv" | sudo tee /etc/modules-load.d/virtualbox.conf > /dev/null
+	echo "vboxnetflt" | sudo tee -a /etc/modules-load.d/virtualbox.conf > /dev/null
+	echo "vboxnetadp" | sudo tee -a /etc/modules-load.d/virtualbox.conf > /dev/null
+	echo "vboxpci" | sudo tee -a /etc/modules-load.d/virtualbox.conf > /dev/null
+
+	echo "✅ Todo listo. VirtualBox está instalado y listo para cualquier usuario."
+}
 
 instala_programas_fp(){
     # Instalar Wireshark
@@ -131,6 +148,7 @@ instala_programas_fp(){
     # Instalar paquetes .deb
     instalar_deb "PacketTracer.deb"
     instalar_deb "VirtualBox.deb"
+	arreglar_virtualbox
     instalar_deb "VSCode.deb"
     instalar_deb "abconnector_v5_4_linux64.deb"
     
