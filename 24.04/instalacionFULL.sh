@@ -120,7 +120,8 @@ instala_programas_eso(){
     instala_programas_fp
 }
 
-arreglar_virtualbox(){
+instala_arregla_virtualbox(){
+	# Instalo la versión VBOX 7.0
 	sudo apt install -y virtualbox virtualbox-dkms linux-headers-$(uname -r)
 
 	echo "✅ Cargando módulos de VirtualBox..."
@@ -147,8 +148,8 @@ instala_programas_fp(){
 
     # Instalar paquetes .deb
     instalar_deb "PacketTracer.deb"
-    instalar_deb "VirtualBox.deb"
-	arreglar_virtualbox
+    # instalar_deb "VirtualBox.deb" INSTALO VBOX 7.1 PERO DA PROBLEMAS
+	instala_arregla_virtualbox 
     instalar_deb "VSCode.deb"
     instalar_deb "abconnector_v5_4_linux64.deb"
     
