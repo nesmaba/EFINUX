@@ -93,6 +93,51 @@ preparar_instalacion_packettracer(){
     instalar_deb libxcb-xinerama0-dev_1.15-1ubuntu2_amd64.deb
 }
 
+instalar_promethean_activinspire() {
+  echo "Iniciando instalación de ActivInspire (idioma: español) en Ubuntu 24.04..."
+
+  # 1. Backup de sources.list
+  echo "Realizando copia de seguridad de /etc/apt/sources.list..."
+  sudo cp /etc/apt/sources.list /etc/apt/sources.list.backup
+
+  # 2. Añadir repositorio si no existe ya
+  REPO_LINE="deb https://activsoftware.co.uk/linux/repos/ubuntu focal non-oss"
+  if ! grep -Fxq "$REPO_LINE" /etc/apt/sources.list; then
+    echo "Añadiendo repositorio de ActivInspire..."
+    echo "$REPO_LINE" | sudo tee -a /etc/apt/sources.list
+  else
+    echo "El repositorio ya está presente."
+  fi
+
+  # 3. Descargar y añadir la clave
+  echo "Descargando clave de autenticación..."
+  mkdir -p ~/Descargas
+  cd ~/Descargas || return
+  wget -q https://activsoftware.co.uk/linux/repos/driver/PrometheanLtd.asc
+
+  echo "Añadiendo clave de autenticación..."
+  sudo apt-key add PrometheanLtd.asc
+
+  # 4. Actualizar la caché de repositorios
+  echo "Actualizando lista de paquetes..."
+  sudo apt update
+  instalar_deb libre2-5.deb
+  instalar_deb libgl1-mesa-glx_23.0.4-0ubuntu1~22.04.1_amd64.deb
+  
+  # 5. Instalar ActivInspire en español
+  paquete="activ-meta-es"
+  echo "Instalando paquete $paquete..."
+  if ! sudo apt install -y "$paquete"; then
+    echo "Fallo en la instalación. Posibles paquetes rotos. Intentando con aptitude..."
+
+    # 6. Reparar paquetes rotos con aptitude
+    sudo apt-get install -y aptitude
+    sudo aptitude install "$paquete"
+  else
+    echo "Instalación completada correctamente."
+  fi
+}
+
 preparar_instalacion_abconnector(){
     sudo apt install python3 python3-tk python3-serial python-is-python3
 }
@@ -707,6 +752,9 @@ EOF
 	# sudo tee "$netplan_file" > /dev/null <<EOF
 	# Y AQUI PONDRIA YA EL CONTENIDO DEL FICHERO CONFIGURACION YAML
 	
+	instalar_promethean_activinspire
+    instalar_deb "openboard.deb"
+
 	instalar_programas
 
 	fin

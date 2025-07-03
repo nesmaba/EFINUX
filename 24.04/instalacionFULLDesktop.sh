@@ -115,7 +115,7 @@ instalar_programas(){
     echo "Empezamos a INSTALAR APLICACIONES..."
     instalar_deb "openboard.deb"
 	instalar_promethean_activinspire
-	
+
     sudo apt autoclean
     sudo apt autoremove -y
 
@@ -152,7 +152,9 @@ instalar_promethean_activinspire() {
   # 4. Actualizar la caché de repositorios
   echo "Actualizando lista de paquetes..."
   sudo apt update
-
+  instalar_deb libre2-5.deb
+  instalar_deb libgl1-mesa-glx_23.0.4-0ubuntu1~22.04.1_amd64.deb
+  
   # 5. Instalar ActivInspire en español
   paquete="activ-meta-es"
   echo "Instalando paquete $paquete..."
