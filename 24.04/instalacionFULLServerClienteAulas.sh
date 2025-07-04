@@ -481,7 +481,7 @@ Auth: required pam_group.so"
 	# Añadir contenido al fichero common-auth antes de la configuración de pam_ldap y pam_krb5
 	sudo sed -i -e "/^auth.*pam_ldap.so/ i $common_auth_content" "$common_auth_file"
 
-	echo "Ahora selecciona todas las opciones menos las que pone smartcard"
+	echo "Ahora selecciona, dejando las ya seleccionadas, la de crear la carpeta home (SMARTCARD NO seleccionarlas)"
 	read
 	sudo pam-auth-update
 

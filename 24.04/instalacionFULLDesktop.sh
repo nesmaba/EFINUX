@@ -379,7 +379,7 @@ inicio() {
 	# Cambiar fondo de pantalla de todas las sesiones
 	sudo cp warty-final-ubuntu.png /usr/share/backgrounds/
 	sudo chmod a+r /usr/share/backgrounds/warty-final-ubuntu.png
-	# bloquear_fondo_pantalla
+	bloquear_fondo_pantalla
 
 	# Ruta del fichero pam-configs/my_groups
 	pam_configs_file="/usr/share/pam-configs/my_groups"
@@ -404,7 +404,7 @@ Auth: required pam_group.so"
 	# Añadir contenido al fichero common-auth antes de la configuración de pam_ldap y pam_krb5
 	sudo sed -i -e "/^auth.*pam_ldap.so/ i $common_auth_content" "$common_auth_file"
 
-	echo "Ahora selecciona todas las opciones menos las que pone smartcard"
+	echo "Ahora selecciona, dejando las ya seleccionadas, la de crear la carpeta home (SMARTCARD NO seleccionarlas)"
 	read
 	sudo pam-auth-update
 
