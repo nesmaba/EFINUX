@@ -334,7 +334,7 @@ inicio() {
 	sudo cp "Google_2028_03_31_28472.key" "/var/"
 	sudo chmod a+r /var/Google_2028_03_31_28472.key
 
-	sssd_profesorado
+	sssd_alumnado
 	
 	# Cambiar los permisos del archivo sssd.conf
 	sudo chmod 600 /etc/sssd/sssd.conf
@@ -577,7 +577,7 @@ sudo apt install -y nmap
 sudo apt install -y clusterssh
 
 sudo apt-get install -y epoptes
-sudo apt install python3-pip
+sudo apt install -y python3-pip
 
 instalar_programas
 
