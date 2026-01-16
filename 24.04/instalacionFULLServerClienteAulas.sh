@@ -603,6 +603,17 @@ rm -f "$HOME/.config/google-chrome/SingletonLock" \
 
 }
 
+quitamos_bloqueo_pantalla(){
+	# Deshabilitar el bloqueo de pantalla
+	gsettings set org.gnome.desktop.screensaver lock-enabled false
+	gsettings set org.gnome.desktop.screensaver idle-activation-enabled false
+
+	# Configurar el tiempo de espera para que la pantalla no se apague (0 = nunca)
+	gsettings set org.gnome.desktop.session idle-delay 0
+
+	echo "🔓 Bloqueo de pantalla deshabilitado."
+}
+
 fin(){
 	# Si ejecuto la siguiente instrucción se sale de todo, entonces prefiero hacerlo con el reboot.
 	# sudo systemctl restart lightdm
@@ -615,6 +626,10 @@ fin(){
 }
 
 # INICIO DEL SCRIPT
+
+echo "Iniciando el script de configuración para servidor y clientes de aulas..."
+# Quitamos bloqueo de pantalla ya que se raya el sistema, y falla la configuración del PC. 
+quitamos_bloqueo_pantalla
 
 # Comprobar conexión a Internet
 if ping -q -c 1 -W 2 8.8.8.8 >/dev/null; then
