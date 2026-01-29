@@ -513,7 +513,9 @@ Auth: required pam_group.so"
 	# sudo systemctl restart fusioninventory-agent
 
 	# En lugar de fusioninventory instalamos GLPI agent. La versión 1.10 pero hay que cambiar el nombre del archivo a glpi-agent.pl
-	sudo perl glpi-agent.pl --server=10.10.100.23:8080
+	# sudo perl glpi-agent.pl --server=10.10.100.23:8080
+	# Ahora GLPI lo tenemos en nuestro VPS
+	sudo perl glpi-agent.pl --server=https://sai.lapurisimavalencia.com
 
 	# Instala Google Chrome
 	wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
