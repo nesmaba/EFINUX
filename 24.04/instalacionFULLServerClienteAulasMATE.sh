@@ -86,42 +86,11 @@ EOF
     echo "Acceso directo para $nombre creado en $RUTA_DESKTOP"
 }
 
-instala_programas_eso(){
-    # Instalar AppImages
-    instalar_appimage "Arduino.AppImage"
-    instalar_appimage "GDevelop.AppImage"
-    instalar_appimage "UltiMakerCura.AppImage"
-    instalar_appimage "MuseScore.AppImage"
-
-    # Copiar iconos a la ruta de aplicaciones
-    echo "Copiando iconos..."
-    sudo cp "$RUTA_SCRIPT_APPS/arduino.png" "$RUTA_ICONOS/"
-    sudo cp "$RUTA_SCRIPT_APPS/cura.png" "$RUTA_ICONOS/"
-    sudo cp "$RUTA_SCRIPT_APPS/gdevelop.png" "$RUTA_ICONOS/"
-    sudo cp "$RUTA_SCRIPT_APPS/musescore.png" "$RUTA_ICONOS/"
-
-    # Crear accesos directos
-    crear_acceso_directo "ArduinoIDE" "Arduino.AppImage --no-sandbox" "arduino.png"
-    crear_acceso_directo "GDevelop" "GDevelop.AppImage --no-sandbox" "gdevelop.png"
-    crear_acceso_directo "UltiMakerCura" "UltiMakerCura.AppImage" "cura.png"
-    crear_acceso_directo "MuseScore" "MuseScore.AppImage" "musescore.png"
-
-    instala_programas_fp
-}
-
-
-instalar_programas(){
-    
-    echo "Empezamos a INSTALAR APLICACIONES..."
-    instalar_deb "openboard.deb"
-	instalar_promethean_activinspire
-
-    sudo apt autoclean
-    sudo apt autoremove -y
-
-    echo "Todas las aplicaciones y accesos directos han sido instalados correctamente."
-  
-
+preparar_instalacion_packettracer(){
+    # Preparo instalacion para Packet Tracer
+    instalar_deb libgl1-mesa-glx_23.0.4-0ubuntu1~22.04.1_amd64.deb
+    instalar_deb dialog_1.3-20240101-1_amd64.deb
+    instalar_deb libxcb-xinerama0-dev_1.15-1ubuntu2_amd64.deb
 }
 
 instalar_promethean_activinspire() {
@@ -167,6 +136,109 @@ instalar_promethean_activinspire() {
   else
     echo "Instalación completada correctamente."
   fi
+}
+
+preparar_instalacion_abconnector(){
+    sudo apt install python3 python3-tk python3-serial python-is-python3
+}
+
+instala_programas_eso(){
+    # Instalar AppImages
+    instalar_appimage "Arduino.AppImage"
+    instalar_appimage "GDevelop.AppImage"
+    instalar_appimage "UltiMakerCura.AppImage"
+    instalar_appimage "MuseScore.AppImage"
+
+    # Copiar iconos a la ruta de aplicaciones
+    echo "Copiando iconos..."
+    sudo cp "$RUTA_SCRIPT_APPS/arduino.png" "$RUTA_ICONOS/"
+    sudo cp "$RUTA_SCRIPT_APPS/cura.png" "$RUTA_ICONOS/"
+    sudo cp "$RUTA_SCRIPT_APPS/gdevelop.png" "$RUTA_ICONOS/"
+    sudo cp "$RUTA_SCRIPT_APPS/musescore.png" "$RUTA_ICONOS/"
+
+    # Crear accesos directos
+    crear_acceso_directo "ArduinoIDE" "Arduino.AppImage --no-sandbox" "arduino.png"
+    crear_acceso_directo "GDevelop" "GDevelop.AppImage --no-sandbox" "gdevelop.png"
+    crear_acceso_directo "UltiMakerCura" "UltiMakerCura.AppImage" "cura.png"
+    crear_acceso_directo "MuseScore" "MuseScore.AppImage" "musescore.png"
+
+    instala_programas_fp
+}
+
+instala_arregla_virtualbox(){
+	# Instalo la versión VBOX 7.0
+	sudo apt install -y virtualbox virtualbox-dkms linux-headers-$(uname -r)
+
+	echo "✅ Cargando módulos de VirtualBox..."
+	sudo modprobe vboxdrv 2>/dev/null && echo "vboxdrv cargado"
+	sudo modprobe vboxnetflt 2>/dev/null && echo "vboxnetflt cargado"
+	sudo modprobe vboxnetadp 2>/dev/null && echo "vboxnetadp cargado"
+	sudo modprobe vboxpci 2>/dev/null && echo "vboxpci cargado (opcional)"
+
+	echo "📌 Configurando carga automática de módulos en cada arranque..."
+	echo "vboxdrv" | sudo tee /etc/modules-load.d/virtualbox.conf > /dev/null
+	echo "vboxnetflt" | sudo tee -a /etc/modules-load.d/virtualbox.conf > /dev/null
+	echo "vboxnetadp" | sudo tee -a /etc/modules-load.d/virtualbox.conf > /dev/null
+	echo "vboxpci" | sudo tee -a /etc/modules-load.d/virtualbox.conf > /dev/null
+
+	echo "✅ Todo listo. VirtualBox está instalado y listo para cualquier usuario."
+}
+
+instala_programas_fp(){
+    # Instalar Wireshark
+    sudo apt install -y wireshark
+	
+    preparar_instalacion_packettracer
+    preparar_instalacion_abconnector
+
+    # Instalar paquetes .deb
+    instalar_deb "PacketTracer.deb"
+    # instalar_deb "VirtualBox.deb" INSTALO VBOX 7.1 PERO DA PROBLEMAS
+	instala_arregla_virtualbox 
+    instalar_deb "VSCode.deb"
+    instalar_deb "abconnector_v5_4_linux64.deb"
+    
+}
+
+
+instalar_programas(){
+    
+    echo "Empezamos a INSTALAR APLICACIONES..."
+    echo "Seleccione el tipo de instalación:"
+    echo "1) ESO-BCH"
+    echo "2) FP"
+    read -p "Ingrese una opción (1 o 2): " opcionESO_FP
+
+
+    # Configuración específica según la opción elegida
+    if [[ "$opcionESO_FP" == "1" ]]; then
+        instala_programas_eso
+    else
+        instala_programas_fp
+    fi
+
+
+    sudo apt autoclean
+    sudo apt autoremove -y
+
+    echo "Todas las aplicaciones y accesos directos han sido instalados correctamente."
+  
+
+}
+
+obtener_opcion() {
+    while true; do
+        echo "Seleccione el tipo de alumnado:"
+        echo "1) Primaria/Secundaria/Bachillerato"
+        echo "2) FP"
+        read -p "Opción (1 o 2): " opcion
+
+        if [ "$opcion" == "1" ] || [ "$opcion" == "2" ]; then
+            break
+        else
+            echo "Opción no válida. Por favor, elija 1 o 2."
+        fi
+    done
 }
 
 # Función para solicitar la IP del servidor
@@ -334,8 +406,13 @@ inicio() {
 	sudo cp "Google_2028_03_31_28472.key" "/var/"
 	sudo chmod a+r /var/Google_2028_03_31_28472.key
 
-	sssd_alumnado
-	
+	# Crear el archivo sssd.conf
+    if [ "$1" -eq 1 ]; then
+		sssd_profesorado
+	else
+		sssd_alumnado
+	fi
+
 	# Cambiar los permisos del archivo sssd.conf
 	sudo chmod 600 /etc/sssd/sssd.conf
 	
@@ -436,7 +513,9 @@ Auth: required pam_group.so"
 	# sudo systemctl restart fusioninventory-agent
 
 	# En lugar de fusioninventory instalamos GLPI agent. La versión 1.10 pero hay que cambiar el nombre del archivo a glpi-agent.pl
-	sudo perl glpi-agent.pl --server=10.10.100.23:8080
+	# sudo perl glpi-agent.pl --server=10.10.100.23:8080
+	# Ahora GLPI lo tenemos en nuestro VPS
+	sudo perl glpi-agent.pl --server=https://sai.lapurisimavalencia.com
 
 	# Instala Google Chrome
 	wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -537,6 +616,90 @@ quitamos_bloqueo_pantalla(){
 	echo "🔓 Bloqueo de pantalla deshabilitado."
 }
 
+instalamos_mate(){
+
+	echo "========================================="
+	echo " MATE-AULA como Escritorio – Mejor que GNOME para aulas con Epoptes"
+	echo "========================================="
+
+	# -------------------------------
+	# 0️⃣ Instalar MATE si no está
+	# -------------------------------
+	echo "→ Comprobando MATE..."
+	if ! dpkg -l | grep -q mate-desktop-environment; then
+		echo "   • MATE no instalado. Instalando..."
+		sudo apt update
+		sudo apt install -y mate-desktop-environment mate-desktop-environment-extra
+	else
+		echo "   • MATE ya instalado."
+	fi
+
+	# -------------------------------
+	# 1️⃣ Eliminar GNOME / Ubuntu / Wayland
+	# -------------------------------
+	echo "→ Eliminando GNOME y Wayland..."
+	sudo apt purge -y ubuntu-desktop gnome-shell gdm3 gnome-session gnome-session-bin gnome-session-common # gnome-session-wayland NO EXISTE DICHO PAQUETE Y PETA
+	sudo apt autoremove -y --purge
+
+	# -------------------------------
+	# 2️⃣ Forzar MATE en LightDM
+	# -------------------------------
+	echo "→ Configurando LightDM para usar MATE por defecto..."
+	sudo mkdir -p /etc/lightdm/lightdm.conf.d
+	sudo cat > /etc/lightdm/lightdm.conf.d/99-mate.conf <<EOF
+[Seat:*]
+user-session=mate
+greeter-session=lightdm-gtk-greeter
+EOF
+
+	# -------------------------------
+	# 3️⃣ Machacar fondo de MATE
+	# -------------------------------
+	FONDO="/usr/share/backgrounds/warty-final-ubuntu.png"
+	MATE_DEFAULT="/usr/share/backgrounds/ubuntu-mate-common/Green-Wall-Logo.png"
+
+	echo "→ Sobrescribiendo fondo de MATE..."
+	if [ ! -f "${MATE_DEFAULT}.bak" ]; then
+		sudo cp "$MATE_DEFAULT" "${MATE_DEFAULT}.bak"
+	fi
+	sudocp "$FONDO" "$MATE_DEFAULT"
+
+	echo "Iniciando configuración de fondo bloqueado para MATE..."
+
+	# 1. Crear perfil de dconf si no existe
+	sudo mkdir -p /etc/dconf/profile
+	if [ ! -f /etc/dconf/profile/user ]; then
+		sudo echo -e "user-db:user\nsystem-db:local" > /etc/dconf/profile/user
+		sudo echo "[OK] Perfil dconf creado."
+	fi
+
+	# 2. Crear directorios de la base de datos local
+	sudo mkdir -p /etc/dconf/db/local.d/locks
+
+	# 3. Configurar el fondo de pantalla
+	sudo cat <<EOF > /etc/dconf/db/local.d/00-background
+[org/mate/desktop/background]
+picture-filename='/usr/share/backgrounds/warty-final-ubuntu.png'
+picture-options='zoom'
+primary-color='#000000'
+EOF
+
+	# 4. Bloquear la configuración para que los usuarios no puedan cambiarla
+	sudo cat <<EOF > /etc/dconf/db/local.d/locks/00-background
+/org/mate/desktop/background/picture-filename
+/org/mate/desktop/background/picture-options
+EOF
+
+	# 5. Asegurar permisos de la imagen (por si acaso)
+	sudo chmod 644 /usr/share/backgrounds/warty-final-ubuntu.png
+
+	# 6. Actualizar la base de datos de dconf
+	sudo dconf update
+
+	echo "-------------------------------------------------------"
+	echo "¡Hecho! El fondo de MATE ha sido configurado y bloqueado."
+}
+
 fin(){
 	# Si ejecuto la siguiente instrucción se sale de todo, entonces prefiero hacerlo con el reboot.
 	# sudo systemctl restart lightdm
@@ -550,6 +713,10 @@ fin(){
 
 # INICIO DEL SCRIPT
 
+echo "Iniciando el script de configuración para servidor y clientes de aulas..."
+# Quitamos bloqueo de pantalla ya que se raya el sistema, y falla la configuración del PC. 
+quitamos_bloqueo_pantalla
+
 # Comprobar conexión a Internet
 if ping -q -c 1 -W 2 8.8.8.8 >/dev/null; then
     echo "Conexión a Internet detectada."
@@ -558,46 +725,228 @@ else
     exit 1
 fi
 
-quitamos_bloqueo_pantalla
+echo "Seleccione el tipo de instalación:"
+echo "1) Profesorado"
+echo "2) Alumnado"
+read -p "Ingrese una opción (1 o 2): " opcionProfeAlum
 
 # Configuración específica según la opción elegida
-inicio 1
-# PROFESORADO
-# sudo groupadd profesorado
-# sudo groupadd vboxusers
-# sudo groupadd epoptes
-# sudo groupadd wireshark
+if [ "$opcionProfeAlum" == "1" ]; then
+	inicio 1
+	# PROFESORADO
+	sudo groupadd profesorado
+	sudo groupadd vboxusers
+	sudo groupadd epoptes
+	sudo groupadd wireshark
 
-# Agregar usuarios a grupos
-# sudo usermod -aG vboxusers,dialout,epoptes,wireshark,profesorado $USER
+	# Agregar usuarios a grupos
+	sudo usermod -aG vboxusers,dialout,epoptes,wireshark,profesorado $USER
 
-# Configurar pam para agregar usuarios a grupos al inicio
-# echo "*;*;*;Al0000-2400;users,dialout,vboxusers,epoptes,wireshark,profesorado" | sudo tee -a /etc/security/group.conf
+	# Configurar pam para agregar usuarios a grupos al inicio
+	echo "*;*;*;Al0000-2400;users,dialout,vboxusers,epoptes,wireshark,profesorado" | sudo tee -a /etc/security/group.conf
 
-# NO ME FUNCIONA LO SIGUIENTE Agregar las nuevas reglas para asignación de grupos basada en dominios
-echo "# Archivo de configuración para asignación de grupos basada en dominios" | sudo tee -a /etc/security/group.conf
-echo "# Reglas para asignar el grupo 'profesorado' a los usuarios del dominio lapurisimavalencia.com" | sudo tee -a /etc/security/group.conf
-echo "+ : profesorado : @lapurisimavalencia.com" | sudo tee -a /etc/security/group.conf
-echo "# Reglas para asignar el grupo 'alumnado' a los usuarios del dominio alu.lapurisimavalencia.com" | sudo tee -a /etc/security/group.conf
-echo "+ : alumnado : @alu.lapurisimavalencia.com" | sudo tee -a /etc/security/group.conf
+	# NO ME FUNCIONA LO SIGUIENTE Agregar las nuevas reglas para asignación de grupos basada en dominios
+	echo "# Archivo de configuración para asignación de grupos basada en dominios" | sudo tee -a /etc/security/group.conf
+	echo "# Reglas para asignar el grupo 'profesorado' a los usuarios del dominio lapurisimavalencia.com" | sudo tee -a /etc/security/group.conf
+	echo "+ : profesorado : @lapurisimavalencia.com" | sudo tee -a /etc/security/group.conf
+	echo "# Reglas para asignar el grupo 'alumnado' a los usuarios del dominio alu.lapurisimavalencia.com" | sudo tee -a /etc/security/group.conf
+	echo "+ : alumnado : @alu.lapurisimavalencia.com" | sudo tee -a /etc/security/group.conf
 
-echo "Reglas añadidas correctamente al archivo /etc/security/group.conf"
+	echo "Reglas añadidas correctamente al archivo /etc/security/group.conf"
 
-# Instalar nmap para poder realizar el cssh a todos los clientes 
-sudo apt install -y nmap
+	# Instalar nmap para poder realizar el cssh a todos los clientes 
+	sudo apt install -y nmap
 
-# Instalar el paquete clusterssh (cssh para conectarse a los diferentes clientes y poder lanzar un comando a la vez en varios clientes). 
-sudo apt install -y clusterssh
+	# Instalar el paquete clusterssh (cssh para conectarse a los diferentes clientes y poder lanzar un comando a la vez en varios clientes). 
+	sudo apt install -y clusterssh
 
-sudo apt-get install -y epoptes
-sudo apt install -y python3-pip
+	sudo apt-get install -y epoptes
+	sudo apt install python3-pip
 
-instalar_programas
+	# Creo una carpeta compartida para colgar ISOs etc etc
+	compartir_carpetas
 
-sudo cp PRIM_ESO_BCHCloudManagementEnrollmentToken /etc/opt/chrome/policies/enrollment/CloudManagementEnrollmentToken
-sudo chmod a+r /etc/opt/chrome/policies/enrollment/CloudManagementEnrollmentToken
+	# Copiar el archivo conectarmeClientesAula.sh al Escritorio del usuario
+	# Obtener el nombre del usuario que ejecuta el script
+	usuario=$(whoami)
 
-sudo cp PRIM_ESO_BCHCloudManagementEnrollmentToken /opt/google/chrome/policies/enrollment/CloudManagementEnrollmentToken
-sudo chmod a+r /opt/google/chrome/policies/enrollment/CloudManagementEnrollmentToken
+	# Directorio del archivo fuente
+	archivo_fuente="conectarmeClientesAula.sh"
 
-fin
+	# Determinar el directorio del Escritorio (Desktop o Escritorio)
+	if [ -d "/home/$usuario/Desktop" ]; then
+	    directorio_escritorio="/home/$usuario/Desktop"
+	elif [ -d "/home/$usuario/Escritorio" ]; then
+	    directorio_escritorio="/home/$usuario/Escritorio"
+	else
+	    echo "No se encontró un directorio de Escritorio."
+	    exit 1
+	fi
+
+	# Verificar si el archivo fuente existe
+	if [ -f "$archivo_fuente" ]; then
+	    # Crear el directorio del Escritorio si no existe
+	    mkdir -p "$directorio_escritorio"
+
+	    # Copiar el archivo al Escritorio
+	    cp "$archivo_fuente" "$directorio_escritorio/"
+	    
+	    echo "Archivo $archivo_fuente copiado a $directorio_escritorio."
+	else
+	    echo "El archivo $archivo_fuente no se encontró en el directorio actual."
+	fi
+
+	# Damos permisos de ejecución solo a root y propietario. grupo y otros solo tienen permisos de lectura.
+	sudo chmod 744 "$directorio_escritorio/$archivo_fuente"
+
+	# Configuro la IP estática para el profesorado
+
+	# Solicitar la IP estática al usuario
+
+	read -p "Introduce la IP estática (por ejemplo, 192.168.1.100): " ip_estatica
+
+	# Calcular la dirección del gateway (el último byte de la IP será .10)
+	gateway=$(echo $ip_estatica | sed 's/\.[0-9]\+$/\.10/')
+
+	# Obtener el nombre de la interfaz de red (excluyendo la interfaz loopback lo)
+	interface=$(ip -o -4 addr show up primary scope global | awk '{print $2}' | head -n 1)
+
+	if [ -z "$interface" ]; then
+	    echo "No se pudo detectar una interfaz de red activa."
+	    exit 1
+	fi
+
+	# Crear el archivo de configuración de netplan
+	sudo tee "/etc/netplan/01-netcfg-efi.yaml" > /dev/null <<EOF
+network:
+   version: 2
+   ethernets:
+    $interface:
+      dhcp4: no
+      addresses:
+        - $ip_estatica/24
+      routes:
+        - to: default
+          via: $gateway
+      nameservers:
+        addresses:
+          - 8.8.8.8
+          - 8.8.4.4
+EOF
+
+	# Aplicar la configuración de netplan
+	sudo netplan apply
+
+	# VERSION BORRANDO EL FICHERO YAML Y CREANDO UNO NUEVO
+	# Buscar el archivo de configuración de Netplan
+	# netplan_file=$(sudo ls /etc/netplan/*.yaml 2>/dev/null | head -n 1)
+
+	# if [ -z "$netplan_file" ]; then
+	#     echo "No se encontró ningún archivo de configuración de Netplan. Creando uno nuevo..."
+	#     netplan_file="/etc/netplan/01-netcfg.yaml"
+	# else
+	    # Hacer una copia de seguridad del archivo original
+	#     sudo cp "$netplan_file" "${netplan_file}.bak"
+	# fi
+
+	# Crear o modificar el archivo de configuración de netplan
+	# sudo tee "$netplan_file" > /dev/null <<EOF
+	# Y AQUI PONDRIA YA EL CONTENIDO DEL FICHERO CONFIGURACION YAML
+	
+	instalar_promethean_activinspire
+    instalar_deb "openboard.deb"
+
+	instalar_programas
+
+	fin
+
+elif [ "$opcionProfeAlum" == "2" ]; then
+	inicio 2
+	#ALUMNADO
+	sudo groupadd alumnado
+	sudo groupadd vboxusers
+	sudo groupadd epoptes
+	sudo groupadd wireshark
+
+	# Agregar usuarios a grupos
+	sudo usermod -aG vboxusers,dialout,epoptes,wireshark,alumnado $USER
+
+	# Configurar pam para agregar usuarios a grupos al inicio
+	echo "*;*;*;Al0000-2400;users,dialout,vboxusers,epoptes,wireshark,alumnado" | sudo tee -a /etc/security/group.conf
+
+	# NO ME FUNCIONA LO SIGUIENTE Agregar las nuevas reglas para asignación de grupos basada en dominios
+	echo "# Archivo de configuración para asignación de grupos basada en dominios" | sudo tee -a /etc/security/group.conf
+	echo "# Reglas para asignar el grupo 'profesorado' a los usuarios del dominio lapurisimavalencia.com" | sudo tee -a /etc/security/group.conf
+	echo "+ : profesorado : @lapurisimavalencia.com" | sudo tee -a /etc/security/group.conf
+	echo "# Reglas para asignar el grupo 'alumnado' a los usuarios del dominio alu.lapurisimavalencia.com" | sudo tee -a /etc/security/group.conf
+	echo "+ : alumnado : @alu.lapurisimavalencia.com" | sudo tee -a /etc/security/group.conf
+
+	echo "Reglas añadidas correctamente al archivo /etc/security/group.conf"
+
+	# Instalar epoptes-client y configurarlo
+	sudo apt-get install -y --install-recommends epoptes-client
+
+	# Añado la IP del server/PC del profesor. 
+	########## MODIFICAR CAMBIA LA IP A LA QUE CORRESPONDA ##########
+	# echo "10.2.122.21  server" | sudo tee -a /etc/hosts > /dev/null
+	# Llamar a la función para obtener la IP del servidor
+	obtener_ip_servidor
+
+	# Añadir la IP del servidor al archivo /etc/hosts
+	echo "$ip_servidor  server" | sudo tee -a /etc/hosts > /dev/null
+	
+	# Configuramos epoptes-client con el server
+	sudo epoptes-client -c
+
+	# Registramos los navegadores para que estén administrados
+	sudo mkdir /etc/opt/chrome
+	sudo mkdir /etc/opt/chrome/policies
+	sudo mkdir /etc/opt/chrome/policies/enrollment
+	# Las rutas anteriores parece que son las antiguas pero las creamos por si acaso.
+	sudo mkdir /opt/google/chrome/policies
+	sudo mkdir /opt/google/chrome/policies/enrollment
+
+
+	# Llamar a la función obtener_opcion, está al inicio del script, para obtener la opción del usuario
+	obtener_opcion
+
+	# Realizar las acciones basadas en la opción seleccionada
+	if [ "$opcion" == "1" ]; then
+	    # Alumnado Primaria, ESO y Bachillerato
+	    sudo cp PRIM_ESO_BCHCloudManagementEnrollmentToken /etc/opt/chrome/policies/enrollment/CloudManagementEnrollmentToken
+	    sudo chmod a+r /etc/opt/chrome/policies/enrollment/CloudManagementEnrollmentToken
+
+	    sudo cp PRIM_ESO_BCHCloudManagementEnrollmentToken /opt/google/chrome/policies/enrollment/CloudManagementEnrollmentToken
+	    sudo chmod a+r /opt/google/chrome/policies/enrollment/CloudManagementEnrollmentToken
+
+		instala_programas_eso
+		crear_usuario innovamat vamat2023
+	    echo "Configuración para Primaria/ESO/Bachillerato aplicada con éxito."
+		
+	elif [ "$opcion" == "2" ]; then
+	    # Alumnado FP
+	    sudo cp FP_CloudManagementEnrollmentToken /etc/opt/chrome/policies/enrollment/CloudManagementEnrollmentToken
+	    sudo chmod a+r /etc/opt/chrome/policies/enrollment/CloudManagementEnrollmentToken
+
+	    sudo cp FP_CloudManagementEnrollmentToken /opt/google/chrome/policies/enrollment/CloudManagementEnrollmentToken
+	    sudo chmod a+r /opt/google/chrome/policies/enrollment/CloudManagementEnrollmentToken
+
+		instala_programas_fp
+	    echo "Configuración para FP aplicada con éxito."
+		
+	fi
+
+
+	# Siguiente fichero se crea para que obligue a registrar el navegador
+	sudo cp CloudManagementEnrollmentOptions /etc/opt/chrome/policies/enrollment/
+	sudo chmod a+r /etc/opt/chrome/policies/enrollment/CloudManagementEnrollmentOptions
+
+	sudo cp CloudManagementEnrollmentOptions /opt/google/chrome/policies/enrollment/
+	sudo chmod a+r /opt/google/chrome/policies/enrollment/CloudManagementEnrollmentOptions
+	
+	fin
+	
+else
+    echo "Opción no válida. Saliendo..."
+    exit 1
+fi
