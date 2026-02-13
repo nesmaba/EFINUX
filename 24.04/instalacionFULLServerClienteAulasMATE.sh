@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Todo el flujo (stdout y stderr) se redirige a mi_log.txt
+exec > >(tee -a script_efinux.log) 2>&1
+
 # Definir la ruta donde están los programas
 RUTA_SCRIPT=$(dirname "$(realpath "$0")")
 RUTA_SCRIPT_APPS="$(dirname "$(realpath "$0")")/Aplicaciones"
@@ -652,18 +655,6 @@ user-session=mate
 greeter-session=lightdm-gtk-greeter
 EOF
 
-	# -------------------------------
-	# 3️⃣ Machacar fondo de MATE
-	# -------------------------------
-	FONDO="/usr/share/backgrounds/warty-final-ubuntu.png"
-	MATE_DEFAULT="/usr/share/backgrounds/ubuntu-mate-common/Green-Wall-Logo.png"
-
-	echo "→ Sobrescribiendo fondo de MATE..."
-	if [ ! -f "${MATE_DEFAULT}.bak" ]; then
-		sudo cp "$MATE_DEFAULT" "${MATE_DEFAULT}.bak"
-	fi
-	sudocp "$FONDO" "$MATE_DEFAULT"
-
 	echo "Iniciando configuración de fondo bloqueado para MATE..."
 
 	# 1. Crear perfil de dconf si no existe
@@ -906,6 +897,8 @@ elif [ "$opcionProfeAlum" == "2" ]; then
 	sudo mkdir /opt/google/chrome/policies
 	sudo mkdir /opt/google/chrome/policies/enrollment
 
+	# Instalamos MATE como escritorio
+	instalamos_mate
 
 	# Llamar a la función obtener_opcion, está al inicio del script, para obtener la opción del usuario
 	obtener_opcion
